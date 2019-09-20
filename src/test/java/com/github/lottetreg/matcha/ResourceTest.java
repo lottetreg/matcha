@@ -2,7 +2,6 @@ package com.github.lottetreg.matcha;
 
 import com.github.lottetreg.cup.Request;
 import com.github.lottetreg.cup.Response;
-
 import org.junit.Test;
 
 import java.util.HashMap;
