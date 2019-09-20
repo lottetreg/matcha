@@ -3,6 +3,7 @@ package com.github.lottetreg.matcha;
 import com.github.lottetreg.cup.Request;
 import com.github.lottetreg.cup.Response;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -16,7 +17,8 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 
 public class BaseControllerTest {
-  public class TestController extends BaseController {
+  @Ignore
+  public static class TestController extends BaseController {
     public void empty() {
     }
 

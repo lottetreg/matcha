@@ -3,6 +3,7 @@ package com.github.lottetreg.matcha;
 import com.github.lottetreg.cup.Request;
 import com.github.lottetreg.cup.Response;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -25,14 +26,8 @@ public class RouteTest {
     return new Route("", "", controller, "");
   }
 
-  public static class Controller implements Controllable {
-    Request request;
-
-    public Controllable setRequest(Request request) {
-      this.request = request;
-      return this;
-    }
-
+  @Ignore
+  public static class Controller extends BaseController {
     public Response call(String actionName) {
       return new Response(200);
     }
@@ -49,6 +44,7 @@ public class RouteTest {
     assertEquals(new HashMap<>(), response.getHeaders());
   }
 
+  @Ignore
   public static class BrokenConstructor implements Controllable {
     Request request;
 
