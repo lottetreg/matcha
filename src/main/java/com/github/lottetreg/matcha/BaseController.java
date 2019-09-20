@@ -61,8 +61,7 @@ public class BaseController implements Controllable {
       throw new FailedToInvokeControllerAction(actionName, e);
 
     } catch (FileHelpers.MissingFile e) {
-      // TODO: return 400 response
-      throw new RuntimeException(e.getMessage(), e);
+      return new Response(404);
 
     } catch (TemplateRenderer.MissingContextKey e) {
       throw new MissingTemplateData(e.getMessage(), e);

@@ -8,7 +8,7 @@ import java.nio.file.Path;
 import java.util.Map;
 
 public class Resource extends BaseRoute {
-  String resourcePath;
+  private String resourcePath;
 
   public Resource(String method, String path, String resourcePath) {
     super(method, path);
@@ -23,8 +23,7 @@ public class Resource extends BaseRoute {
       return new Response(200, Map.of("Content-Type", contentType), fileContents);
 
     } catch (FileHelpers.MissingFile e) {
-      // TODO: return 400 response
-      throw new RuntimeException(getResourcePath(), e);
+      return new Response(404);
     }
   }
 

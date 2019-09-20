@@ -45,8 +45,12 @@ public class ResourceTest {
 
   @Test
   public void itReturnsA404IfTheResourceIsMissing() {
-//    // TODO: implement test
-//    Resource resource = new Resource("", "", "/missing.html");
-//    resource.getResponse(emptyRequest());
+    Resource resource = new Resource("", "", "/missing.html");
+
+    Response response = resource.getResponse(emptyRequest());
+
+    assertEquals(404, response.getStatusCode());
+    assertEquals("", new String(response.getBody()));
+    assertEquals(new HashMap<>(), response.getHeaders());
   }
 }

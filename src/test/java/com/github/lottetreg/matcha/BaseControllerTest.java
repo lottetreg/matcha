@@ -120,6 +120,17 @@ public class BaseControllerTest {
   }
 
   @Test
+  public void callReturns404IfFileIsMissing() {
+    Controllable controller = new TestController().setRequest(emptyRequest());
+
+    Response response = controller.call("missingFile");
+
+    assertEquals(404, response.getStatusCode());
+    assertEquals("", new String(response.getBody()));
+    assertEquals(new HashMap<>(), response.getHeaders());
+  }
+
+  @Test
   public void callThrowsAnExceptionIfTemplateDataIsMissing() {
     Controllable controller = new TestController().setRequest(emptyRequest());
 
