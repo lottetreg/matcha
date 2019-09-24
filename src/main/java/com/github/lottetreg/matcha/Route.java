@@ -1,6 +1,5 @@
 package com.github.lottetreg.matcha;
 
-import com.github.lottetreg.cup.BaseRoute;
 import com.github.lottetreg.cup.Request;
 import com.github.lottetreg.cup.Response;
 
