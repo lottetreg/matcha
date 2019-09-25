@@ -2,6 +2,7 @@ package com.github.lottetreg.matcha;
 
 import com.github.lottetreg.cup.Request;
 import com.github.lottetreg.cup.Response;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.*;
@@ -14,6 +15,7 @@ public class RouterTest {
     return new Request(method, path, new HashMap<>(),"");
   }
 
+  @Ignore
   static class MockRoute extends BaseRoute {
     MockRoute(String method, String path) {
       super(method, path);
