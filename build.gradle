@@ -18,6 +18,7 @@ repositories {
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     implementation 'com.github.lottetreg:cup:0.1.0'
+    implementation 'org.apache.commons:commons-csv:1.7'
 }
 
 jar {
