@@ -3,7 +3,7 @@ plugins {
     id 'maven'
 }
 
-version '1.0'
+version '0.1.0'
 
 group = 'com.github.lottetreg'
 
@@ -17,7 +17,13 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
-    implementation 'com.github.lottetreg:cup:v1.0'
+    implementation 'com.github.lottetreg:cup:0.1.0'
+}
+
+jar {
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
 }
 
 wrapper {
