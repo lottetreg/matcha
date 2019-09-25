@@ -1,5 +1,7 @@
 package com.github.lottetreg.matcha;
 
+import org.atteo.evo.inflector.English;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -16,6 +18,7 @@ public class BaseModel {
   private void setField(String field, String value) {
     try {
       this.getClass().getDeclaredField(field).set(this, value);
+
     } catch (NoSuchFieldException | IllegalAccessException e) {
       throw new RuntimeException(e);
     }
@@ -25,7 +28,9 @@ public class BaseModel {
     try {
       Constructor<T> constructor = klass.getConstructor(Map.class);
       List<T> objects = new ArrayList<>();
-      List<Map<String, String>> records = database.selectAll(klass);
+
+      String tableName = English.plural(klass.getSimpleName()).toLowerCase();
+      List<Map<String, String>> records = database.selectAll(tableName);
 
       for (Map<String, String> record : records) {
         T object = constructor.newInstance(record);

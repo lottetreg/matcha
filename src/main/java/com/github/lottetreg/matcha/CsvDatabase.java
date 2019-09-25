@@ -11,25 +11,15 @@ import java.util.List;
 import java.util.Map;
 
 class CsvDatabase implements Persistable {
-  public List<Map<String, String>> selectAll(Class klass) {
-    try {
-      String tableName = klass.getField("tableName").get(null).toString();
-      String csvFileName = tableName + ".csv";
-      Iterable<CSVRecord> records = parse(csvFileName);
+  public List<Map<String, String>> selectAll(String csvFileName) {
+    Iterable<CSVRecord> records = parse(csvFileName + ".csv");
 
-      List<Map<String, String>> results = new ArrayList<>();
-
-      for (CSVRecord record : records) {
-        results.add(record.toMap());
-      }
-
-      return results;
-
-    } catch (NoSuchFieldException |
-        IllegalAccessException e)
-    {
-      throw new RuntimeException(e);
+    List<Map<String, String>> results = new ArrayList<>();
+    for (CSVRecord record : records) {
+      results.add(record.toMap());
     }
+
+    return results;
   }
 
   private Iterable<CSVRecord> parse(String filePath) {

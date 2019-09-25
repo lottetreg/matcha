@@ -16,6 +16,7 @@ public class Route extends BaseRoute {
     this.actionName = actionName;
   }
 
+  @SuppressWarnings("unchecked")
   public Response getResponse(Request request) {
     String controllerName = getControllerName();
     String actionName = getActionName();
