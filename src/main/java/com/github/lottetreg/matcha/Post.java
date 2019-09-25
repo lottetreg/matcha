@@ -3,23 +3,12 @@ package com.github.lottetreg.matcha;
 import java.util.Map;
 
 public class Post extends BaseModel {
-  public String slug; // have to be public to allow for setting by BaseModel (like attr_accessible?)
+  public static String tableName = "posts";
+  public String slug; // have to be public to allow for setting by BaseModel
   public String title;
   public String body;
 
-  public Post(Map<String, String> data) {
+  public Post(Map<String, String> data) { // can hide this behaviour?
     super(data);
-  }
-
-  public String getSlug() {
-    return this.slug;
-  }
-
-  public String getTitle() {
-    return this.title;
-  }
-
-  public String getBody() {
-    return this.body;
   }
 }

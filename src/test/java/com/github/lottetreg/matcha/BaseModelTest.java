@@ -19,12 +19,14 @@ public class BaseModelTest {
 //    }
 //  }
 
-  @Test
-  public void itReturnsAListOfAllObjects() throws Exception {
-    List<Post> posts = Post.all(Post.class, "src/test/java/com/github/lottetreg/matcha/support/posts.csv");
+  // can create and write to /posts.csv file from in here?
 
-    assertEquals("how-to-do-something", posts.get(0).getSlug());
-    assertEquals("How to Do Something", posts.get(0).getTitle());
-    assertEquals("Have you ever wanted to know how to do something?", posts.get(0).getBody());
+  @Test
+  public void itReturnsAListOfAllObjects() {
+    List<Post> posts = BaseModel.all(Post.class);
+
+    assertEquals("how-to-do-something", posts.get(0).slug);
+    assertEquals("How to Do Something", posts.get(0).title);
+    assertEquals("Have you ever wanted to know how to do something?", posts.get(0).body);
   }
 }
