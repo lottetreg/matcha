@@ -1,6 +1,5 @@
 package com.github.lottetreg.matcha;
 
-import com.github.lottetreg.cup.BaseRoute;
 import com.github.lottetreg.cup.Request;
 import com.github.lottetreg.cup.Response;
 
@@ -17,6 +16,7 @@ public class Route extends BaseRoute {
     this.actionName = actionName;
   }
 
+  @SuppressWarnings("unchecked")
   public Response getResponse(Request request) {
     String controllerName = getControllerName();
     String actionName = getActionName();

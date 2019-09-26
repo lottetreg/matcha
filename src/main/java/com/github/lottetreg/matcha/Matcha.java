@@ -1,7 +1,6 @@
 package com.github.lottetreg.matcha;
 
-import com.github.lottetreg.cup.Cup;
-import com.github.lottetreg.cup.Responsive;
+import com.github.lottetreg.cup.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -14,9 +13,19 @@ import java.util.List;
 import java.util.function.BiPredicate;
 import java.util.stream.Stream;
 
-public class Matcha {
-  public void serve(int portNumber, List<Responsive> routes) throws IOException {
-    new Cup().serve(portNumber, getAllRoutes(routes));
+public class Matcha implements Callable {
+  private Router router;
+
+  public Matcha(List<Responsive> routes) throws IOException {
+    this.router = new Router(getAllRoutes(routes));
+  }
+
+  public void serve(int portNumber) throws IOException {
+    new Cup(this).serve(portNumber);
+  }
+
+  public Response call(Request request) {
+    return this.router.route(request);
   }
 
   private static List<Responsive> getAllRoutes(List<Responsive> routes) throws IOException {
@@ -32,7 +41,7 @@ public class Matcha {
     );
   }
 
-  private static List<Responsive> resourcesForCurrentDirectory() throws IOException { // pass in directory, add unit tests
+  private static List<Responsive> resourcesForCurrentDirectory() throws IOException {
     List<Responsive> resources = new ArrayList<>();
 
     BiPredicate<Path, BasicFileAttributes> isRegularFile =
