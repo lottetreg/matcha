@@ -24,7 +24,7 @@ public class BaseModel {
     }
   }
 
-  static <T> List<T> all(Class<T> klass) {
+  public static <T> List<T> all(Class<T> klass) {
     try {
       Constructor<T> constructor = klass.getConstructor(Map.class);
       List<T> objects = new ArrayList<>();
