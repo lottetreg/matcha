@@ -2,16 +2,21 @@ package com.github.lottetreg.matcha;
 
 import org.junit.Test;
 
+import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import static junit.framework.TestCase.assertEquals;
 
 public class TemplateTest {
+
   @Test
   public void itRendersItself() {
-    Template template = new Template("/src/test/java/com/github/lottetreg/matcha/support/embedded_data.html");
-    Map<String, String> context = Map.of("name", "Pickles");
+    Template template = new Template("/templates/example.twig.html");
+    List<Post> posts = List.of(new Post(Map.of("slug", "how-to-do-something")));
+    Map<String, Object> context = Map.of("posts", posts);
 
-    assertEquals("<h1>Hello, Pickles!</h1>\n", new String(template.render(context)));
+    byte[] renderedTemplate = template.render(context);
+
+    assertEquals("\n<h3>how-to-do-something</h3>\n\n", new String(renderedTemplate));
   }
 }
