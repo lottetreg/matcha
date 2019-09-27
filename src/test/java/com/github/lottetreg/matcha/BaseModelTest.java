@@ -30,11 +30,20 @@ public class BaseModelTest {
   }
 
   @Test
-  public void itReturnsAListOfAllObjects() {
+  public void itReturnsAListOfAllResourcesForAClass() {
     List<Post> posts = BaseModel.all(Post.class);
 
     assertEquals("how-to-do-something", posts.get(0).slug);
     assertEquals("How to Do Something", posts.get(0).title);
     assertEquals("Have you ever wanted to know how to do something?", posts.get(0).body);
+  }
+
+  @Test
+  public void itReturnsAResourcesByAGivenAttribute() {
+    Post post = BaseModel.findBy(Post.class, "slug", "how-to-do-something");
+
+    assertEquals("how-to-do-something", post.slug);
+    assertEquals("How to Do Something", post.title);
+    assertEquals("Have you ever wanted to know how to do something?", post.body);
   }
 }

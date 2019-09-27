@@ -24,12 +24,12 @@ public class BaseModel {
     }
   }
 
-  public static <T> List<T> all(Class<T> klass) {
+  public static <T> List<T> all(Class<T> resourceClass) {
     try {
-      Constructor<T> constructor = klass.getConstructor(Map.class);
+      Constructor<T> constructor = resourceClass.getConstructor(Map.class);
       List<T> objects = new ArrayList<>();
 
-      String tableName = English.plural(klass.getSimpleName()).toLowerCase();
+      String tableName = English.plural(resourceClass.getSimpleName()).toLowerCase();
       List<Map<String, String>> records = database.selectAll(tableName);
 
       for (Map<String, String> record : records) {
@@ -38,6 +38,24 @@ public class BaseModel {
       }
 
       return objects;
+
+    } catch (NoSuchMethodException |
+        InstantiationException |
+        IllegalAccessException |
+        InvocationTargetException e)
+    {
+      throw new RuntimeException(e);
+    }
+  }
+
+  // TODO: DRY up these methods
+  public static <T> T findBy(Class<T> resourceClass, String attribute, String value) {
+    try {
+      Constructor<T> constructor = resourceClass.getConstructor(Map.class);
+
+      String tableName = English.plural(resourceClass.getSimpleName()).toLowerCase();
+      Map<String, String> result = database.selectFirstWhere(tableName, attribute, value);
+      return constructor.newInstance(result);
 
     } catch (NoSuchMethodException |
         InstantiationException |

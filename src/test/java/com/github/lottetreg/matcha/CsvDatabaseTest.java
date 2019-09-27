@@ -23,6 +23,7 @@ public class CsvDatabaseTest {
     List<String> lines = new ArrayList<>();
     lines.add("slug,title,body");
     lines.add("how-to-do-something,How to Do Something,Have you ever wanted to know how to do something?");
+    lines.add("how-to-do-something-else,How to Do Something Else,Have you ever wanted to know how to do something else?");
     Files.write(postsTable, lines);
   }
 
@@ -32,7 +33,7 @@ public class CsvDatabaseTest {
   }
 
   @Test
-  public void itReturnsAListOfAllRecordsOfAClass() {
+  public void itReturnsAListOfAllRecordsFromACSV() {
     CsvDatabase database = new CsvDatabase();
 
     List<Map<String, String>> records = database.selectAll("posts");
@@ -40,5 +41,19 @@ public class CsvDatabaseTest {
     assertEquals("how-to-do-something", records.get(0).get("slug"));
     assertEquals("How to Do Something", records.get(0).get("title"));
     assertEquals("Have you ever wanted to know how to do something?", records.get(0).get("body"));
+    assertEquals("how-to-do-something-else", records.get(1).get("slug"));
+    assertEquals("How to Do Something Else", records.get(1).get("title"));
+    assertEquals("Have you ever wanted to know how to do something else?", records.get(1).get("body"));
+  }
+
+  @Test
+  public void itReturnsARecordWithMatchingCriteriaFromACSV() {
+    CsvDatabase database = new CsvDatabase();
+
+    Map<String, String> record = database.selectFirstWhere("posts", "slug", "how-to-do-something-else");
+
+    assertEquals("how-to-do-something-else", record.get("slug"));
+    assertEquals("How to Do Something Else", record.get("title"));
+    assertEquals("Have you ever wanted to know how to do something else?", record.get("body"));
   }
 }

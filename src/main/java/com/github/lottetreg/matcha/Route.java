@@ -7,22 +7,21 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 public class Route extends BaseRoute {
-  private Class controller;
+  private Class controllerClass;
   private String actionName;
 
-  public Route(String method, String path, Class controller, String actionName) {
+  public Route(String method, String path, Class controllerClass, String actionName) {
     super(method, path);
-    this.controller = controller;
+    this.controllerClass = controllerClass;
     this.actionName = actionName;
   }
 
-  @SuppressWarnings("unchecked")
   public Response getResponse(Request request) {
     String controllerName = getControllerName();
     String actionName = getActionName();
 
     try {
-      Constructor<?> constructor = this.controller.getConstructor();
+      Constructor<?> constructor = this.controllerClass.getConstructor();
       Controllable controller = ((Controllable) constructor.newInstance()).setRequest(request);
 
       return controller.call(actionName);
@@ -36,7 +35,7 @@ public class Route extends BaseRoute {
   }
 
   private String getControllerName() {
-    return this.controller.getSimpleName();
+    return this.controllerClass.getSimpleName();
   }
 
   private String getActionName() {
