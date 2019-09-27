@@ -13,6 +13,7 @@ targetCompatibility = 1.11
 repositories {
     mavenCentral()
     maven { url 'https://jitpack.io' }
+    jcenter()
 }
 
 dependencies {
@@ -20,6 +21,7 @@ dependencies {
     implementation 'com.github.lottetreg:cup:0.1.0'
     implementation 'org.apache.commons:commons-csv:1.7'
     implementation 'org.atteo:evo-inflector:1.2.2'
+    implementation "org.jtwig:jtwig-core:5.87.0.RELEASE"
 }
 
 jar {

@@ -29,10 +29,11 @@ public class Matcha implements Callable {
   }
 
   private static List<Responsive> getAllRoutes(List<Responsive> routes) throws IOException {
-    routes.addAll(defaultRoutes());
-    routes.addAll(resourcesForCurrentDirectory());
+    List<Responsive> mutableRoutesList = new ArrayList<>(routes);
+    mutableRoutesList.addAll(defaultRoutes());
+    mutableRoutesList.addAll(resourcesForCurrentDirectory());
 
-    return routes;
+    return mutableRoutesList;
   }
 
   private static List<Responsive> defaultRoutes() {
