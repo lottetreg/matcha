@@ -24,26 +24,34 @@ public class BaseModel {
     }
   }
 
-  public static <T> List<T> all(Class<T> klass) {
+  public static <T> List<T> all(Class<T> resourceClass) {
+    List<T> objects = new ArrayList<>();
+
+    for (Map<String, String> record : database.select(tableName(resourceClass))) {
+      objects.add(newInstance(resourceClass, record));
+    }
+
+    return objects;
+  }
+
+  public static <T> T findBy(Class<T> resourceClass, String attribute, String value) {
+    return newInstance(
+        resourceClass,
+        database.select(tableName(resourceClass), attribute, value)
+    );
+  }
+
+  private static String tableName(Class resourceClass) {
+    return English.plural(resourceClass.getSimpleName()).toLowerCase();
+  }
+
+  private static <T> T newInstance(Class<T> resourceClass, Map<String, String> data) {
     try {
-      Constructor<T> constructor = klass.getConstructor(Map.class);
-      List<T> objects = new ArrayList<>();
+      Constructor<T> constructor = resourceClass.getConstructor(Map.class);
+      return constructor.newInstance(data);
 
-      String tableName = English.plural(klass.getSimpleName()).toLowerCase();
-      List<Map<String, String>> records = database.selectAll(tableName);
-
-      for (Map<String, String> record : records) {
-        T object = constructor.newInstance(record);
-        objects.add(object);
-      }
-
-      return objects;
-
-    } catch (NoSuchMethodException |
-        InstantiationException |
-        IllegalAccessException |
-        InvocationTargetException e)
-    {
+    } catch (NoSuchMethodException | InstantiationException |
+        IllegalAccessException | InvocationTargetException e) {
       throw new RuntimeException(e);
     }
   }
