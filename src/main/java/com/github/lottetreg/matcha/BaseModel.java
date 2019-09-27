@@ -25,43 +25,33 @@ public class BaseModel {
   }
 
   public static <T> List<T> all(Class<T> resourceClass) {
-    try {
-      Constructor<T> constructor = resourceClass.getConstructor(Map.class);
-      List<T> objects = new ArrayList<>();
+    List<T> objects = new ArrayList<>();
 
-      String tableName = English.plural(resourceClass.getSimpleName()).toLowerCase();
-      List<Map<String, String>> records = database.selectAll(tableName);
-
-      for (Map<String, String> record : records) {
-        T object = constructor.newInstance(record);
-        objects.add(object);
-      }
-
-      return objects;
-
-    } catch (NoSuchMethodException |
-        InstantiationException |
-        IllegalAccessException |
-        InvocationTargetException e)
-    {
-      throw new RuntimeException(e);
+    for (Map<String, String> record : database.select(tableName(resourceClass))) {
+      objects.add(newInstance(resourceClass, record));
     }
+
+    return objects;
   }
 
-  // TODO: DRY up these methods
   public static <T> T findBy(Class<T> resourceClass, String attribute, String value) {
+    return newInstance(
+        resourceClass,
+        database.select(tableName(resourceClass), attribute, value)
+    );
+  }
+
+  private static String tableName(Class resourceClass) {
+    return English.plural(resourceClass.getSimpleName()).toLowerCase();
+  }
+
+  private static <T> T newInstance(Class<T> resourceClass, Map<String, String> data) {
     try {
       Constructor<T> constructor = resourceClass.getConstructor(Map.class);
+      return constructor.newInstance(data);
 
-      String tableName = English.plural(resourceClass.getSimpleName()).toLowerCase();
-      Map<String, String> result = database.selectFirstWhere(tableName, attribute, value);
-      return constructor.newInstance(result);
-
-    } catch (NoSuchMethodException |
-        InstantiationException |
-        IllegalAccessException |
-        InvocationTargetException e)
-    {
+    } catch (NoSuchMethodException | InstantiationException |
+        IllegalAccessException | InvocationTargetException e) {
       throw new RuntimeException(e);
     }
   }

@@ -28,8 +28,6 @@ public class Matcha implements Callable {
     return this.router.route(request);
   }
 
-
-  // TODO: move these somewhere else
   private static List<Responsive> getAllRoutes(List<Responsive> routes) throws IOException {
     List<Responsive> mutableRoutesList = new ArrayList<>(routes);
     mutableRoutesList.addAll(defaultRoutes());

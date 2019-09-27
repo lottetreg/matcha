@@ -10,31 +10,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.StreamSupport;
 
 class CsvDatabase implements Persistable {
-  public List<Map<String, String>> selectAll(String fileName) {
+  public List<Map<String, String>> select(String fileName) {
     Iterable<CSVRecord> records = parse(fileName + ".csv");
 
     List<Map<String, String>> results = new ArrayList<>();
-    for (CSVRecord record : records) {
-      results.add(record.toMap());
-    }
+    records.forEach((record) -> results.add(record.toMap()));
 
     return results;
   }
 
-  // TODO: Dry up these methods
-  public Map<String, String> selectFirstWhere(String fileName, String field, String value) {
-    Iterable<CSVRecord> records = parse(fileName + ".csv");
-
-    Optional<CSVRecord> match = StreamSupport.stream(records.spliterator(), false)
+  public Map<String, String> select(String fileName, String field, String value) {
+    Optional<Map<String, String>> match = select(fileName).stream()
         .filter((record) -> record.get(field).equals(value))
         .findFirst();
 
-    CSVRecord record = match.orElseThrow(RuntimeException::new); // TODO: more explicit
-
-    return record.toMap();
+    return match.orElseThrow(() -> new NoRecordFound(fileName, field, value));
   }
 
   private Iterable<CSVRecord> parse(String filePath) {
@@ -44,6 +36,12 @@ class CsvDatabase implements Persistable {
 
     } catch (IOException e) {
       throw new RuntimeException(e);
+    }
+  }
+
+  class NoRecordFound extends RuntimeException {
+    NoRecordFound(String fileName, String field, String value) {
+      super("No record found with " + field + " of " + value + " in " + fileName);
     }
   }
 }

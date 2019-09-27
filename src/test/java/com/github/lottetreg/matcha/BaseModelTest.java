@@ -13,7 +13,7 @@ import java.util.List;
 import static junit.framework.TestCase.assertEquals;
 
 public class BaseModelTest {
-  static Path postsTable = Path.of("posts.csv");
+  private static Path postsTable = Path.of("posts.csv");
 
   @BeforeClass
   public static void setUpPostsTable() throws IOException {
@@ -21,6 +21,7 @@ public class BaseModelTest {
     List<String> lines = new ArrayList<>();
     lines.add("slug,title,body");
     lines.add("how-to-do-something,How to Do Something,Have you ever wanted to know how to do something?");
+    lines.add("how-to-do-something-else,How to Do Something Else,Have you ever wanted to know how to do something else?");
     Files.write(postsTable, lines);
   }
 
@@ -36,14 +37,17 @@ public class BaseModelTest {
     assertEquals("how-to-do-something", posts.get(0).slug);
     assertEquals("How to Do Something", posts.get(0).title);
     assertEquals("Have you ever wanted to know how to do something?", posts.get(0).body);
+    assertEquals("how-to-do-something-else", posts.get(1).slug);
+    assertEquals("How to Do Something Else", posts.get(1).title);
+    assertEquals("Have you ever wanted to know how to do something else?", posts.get(1).body);
   }
 
   @Test
-  public void itReturnsAResourcesByAGivenAttribute() {
-    Post post = BaseModel.findBy(Post.class, "slug", "how-to-do-something");
+  public void itReturnsAResourceWithAGivenAttribute() {
+    Post post = BaseModel.findBy(Post.class, "slug", "how-to-do-something-else");
 
-    assertEquals("how-to-do-something", post.slug);
-    assertEquals("How to Do Something", post.title);
-    assertEquals("Have you ever wanted to know how to do something?", post.body);
+    assertEquals("how-to-do-something-else", post.slug);
+    assertEquals("How to Do Something Else", post.title);
+    assertEquals("Have you ever wanted to know how to do something else?", post.body);
   }
 }
