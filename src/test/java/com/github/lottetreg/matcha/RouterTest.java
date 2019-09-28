@@ -42,6 +42,17 @@ public class RouterTest {
     assertEquals("some value", response.getHeaders().get("Some-Header"));
   }
 
+  @Test
+  public void itReturnsTheResponseFromTheCorrectRouteWithUrlParams() {
+    List<Responsive> routes = Collections.singletonList(new MockRoute("GET", "/posts/:slug"));
+    Request request = buildRequest("GET", "/posts/some-slug");
+
+    Response response = new Router(routes).route(request);
+
+    assertEquals(200, response.getStatusCode());
+    assertEquals("hello", new String(response.getBody()));
+    assertEquals("some value", response.getHeaders().get("Some-Header"));
+  }
 
   @Test
   public void itReturns404IfThereIsNoRouteWithMatchingPath() {

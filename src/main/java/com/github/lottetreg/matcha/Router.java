@@ -46,8 +46,7 @@ public class Router {
   }
 
   private String getAllowedMethods(String path) {
-    Stream<String> allowedMethods = this.routes.stream()
-        .filter(route -> route.getPath().equals(path))
+    Stream<String> allowedMethods = routesWithMatchingPath(path)
         .map(Responsive::getMethod);
 
     return Stream.concat(allowedMethods, Stream.of("HEAD", "OPTIONS"))
@@ -57,11 +56,11 @@ public class Router {
 
   private Stream<Responsive> routesWithMatchingPath(String path) {
     return this.routes.stream()
-        .filter(route -> route.getPath().equals(path));
+        .filter(route -> route.hasPath(path));
   }
 
   private Boolean noRoutesMatchPath(String path) {
     return this.routes.stream()
-        .noneMatch(route -> route.getPath().equals(path));
+        .noneMatch(route -> route.hasPath(path));
   }
 }
