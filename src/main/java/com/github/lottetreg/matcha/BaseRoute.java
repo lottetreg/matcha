@@ -1,5 +1,7 @@
 package com.github.lottetreg.matcha;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.IntStream;
 
 public abstract class BaseRoute implements Responsive {
@@ -21,12 +23,29 @@ public abstract class BaseRoute implements Responsive {
   }
 
   public Boolean hasPath(String path) {
-    String[] pathA = getPath().split("/");
-    String[] pathB = path.split("/");
+    String[] pathA = splitPath(getPath());
+    String[] pathB = splitPath(path);
 
     return (pathA.length == pathB.length) &&
         IntStream
-            .range(0, Math.min(pathA.length, pathB.length))
+            .range(0, pathA.length)
             .allMatch((i) -> pathA[i].startsWith(paramSymbol) || pathA[i].equals(pathB[i]));
+  }
+
+  public Map<String, String> getParams(String path) {
+    String[] pathA = splitPath(getPath());
+    String[] pathB = splitPath(path);
+    HashMap<String, String> params = new HashMap<>();
+
+    IntStream
+        .range(0, Math.min(pathA.length, pathB.length))
+        .filter((i) -> pathA[i].startsWith(paramSymbol))
+        .forEach((i) -> params.put(pathA[i].substring(1), pathB[i]));
+
+    return params;
+  }
+
+  private String[] splitPath(String path) {
+    return path.split("/");
   }
 }
