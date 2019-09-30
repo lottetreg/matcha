@@ -9,6 +9,7 @@ import java.lang.reflect.InvocationTargetException;
 public class Route extends BaseRoute {
   private Class controllerClass;
   private String actionName;
+  private Controllable controller;
 
   public Route(String method, String path, Class controllerClass, String actionName) {
     super(method, path);
@@ -22,9 +23,11 @@ public class Route extends BaseRoute {
 
     try {
       Constructor<?> constructor = this.controllerClass.getConstructor();
-      Controllable controller = ((Controllable) constructor.newInstance()).setRequest(request);
+      this.controller = ((Controllable) constructor.newInstance())
+          .setRequest(request)
+          .setParams(getParams(request.getPath()));
 
-      return controller.call(actionName);
+      return this.controller.call(actionName);
 
     } catch (NoSuchMethodException e) {
       throw new MissingControllerConstructor(controllerName, e);
@@ -32,6 +35,10 @@ public class Route extends BaseRoute {
     } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
       throw new FailedToInstantiateController(controllerName, e);
     }
+  }
+
+  public Controllable getController() {
+    return this.controller;
   }
 
   private String getControllerName() {

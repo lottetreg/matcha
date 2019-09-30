@@ -30,6 +30,12 @@ public class BaseControllerTest {
       addData("posts", posts);
       return new Template("/templates/example.twig.html");
     }
+
+    public Template embeddedDataWithParams() {
+      List<Post> posts = List.of(new Post(Map.of("slug", getParam("slug"))));
+      addData("posts", posts);
+      return new Template("/templates/example.twig.html");
+    }
   }
 
   private Request emptyRequest() {
@@ -55,6 +61,19 @@ public class BaseControllerTest {
     Controllable controller = new TestController().setRequest(emptyRequest());
 
     Response response = controller.call("embeddedData");
+
+    assertEquals(200, response.getStatusCode());
+    assertEquals("\n<h3>how-to-do-something</h3>\n\n", new String(response.getBody()));
+    assertEquals(new HashMap<>(Map.of("Content-Type", "text/html")), response.getHeaders());
+  }
+
+  @Test
+  public void callReturnsAResponseFromAnActionThatReturnsATemplateWithParams() {
+    Controllable controller = new TestController()
+        .setRequest(emptyRequest())
+        .setParams(Map.of("slug", "how-to-do-something"));
+
+    Response response = controller.call("embeddedDataWithParams");
 
     assertEquals(200, response.getStatusCode());
     assertEquals("\n<h3>how-to-do-something</h3>\n\n", new String(response.getBody()));

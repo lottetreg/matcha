@@ -3,8 +3,14 @@ package com.github.lottetreg.matcha;
 import com.github.lottetreg.cup.Request;
 import com.github.lottetreg.cup.Response;
 
+import java.util.Map;
+
 interface Controllable {
   Controllable setRequest(Request request);
+
+  Controllable setParams(Map<String, String> params);
+
+  Map<String, String> getParams();
 
   Response call(String actionName);
 
@@ -17,18 +23,6 @@ interface Controllable {
   class FailedToInvokeControllerAction extends RuntimeException {
     FailedToInvokeControllerAction(String action, Throwable cause) {
       super(action, cause);
-    }
-  }
-
-  class MissingResource extends RuntimeException {
-    MissingResource(String resourcePath, Throwable cause) {
-      super(resourcePath, cause);
-    }
-  }
-
-  class MissingTemplateData extends RuntimeException {
-    MissingTemplateData(String missingData, Throwable cause) {
-      super(missingData, cause);
     }
   }
 }
