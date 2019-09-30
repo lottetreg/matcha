@@ -10,9 +10,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Router {
-  private List<Responsive> routes;
+  private List<Routable> routes;
 
-  Router(List<Responsive> routes) {
+  Router(List<Routable> routes) {
     this.routes = routes;
   }
 
@@ -33,7 +33,7 @@ public class Router {
         return new Response(200, Map.of("Allow", getAllowedMethods(requestPath)));
 
       default:
-        Optional<Responsive> optionalRoute = routesWithMatchingPath(requestPath)
+        Optional<Routable> optionalRoute = routesWithMatchingPath(requestPath)
             .filter(route -> route.getMethod().equals(requestMethod))
             .findFirst();
 
@@ -47,14 +47,14 @@ public class Router {
 
   private String getAllowedMethods(String path) {
     Stream<String> allowedMethods = routesWithMatchingPath(path)
-        .map(Responsive::getMethod);
+        .map(Routable::getMethod);
 
     return Stream.concat(allowedMethods, Stream.of("HEAD", "OPTIONS"))
         .distinct()
         .collect(Collectors.joining(", "));
   }
 
-  private Stream<Responsive> routesWithMatchingPath(String path) {
+  private Stream<Routable> routesWithMatchingPath(String path) {
     return this.routes.stream()
         .filter(route -> route.hasPath(path));
   }

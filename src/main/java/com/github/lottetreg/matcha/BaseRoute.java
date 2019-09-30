@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.IntStream;
 
-public abstract class BaseRoute implements Responsive {
+public abstract class BaseRoute implements Routable {
   private String path;
   private String method;
   private static final String paramSymbol = ":";
@@ -32,7 +32,7 @@ public abstract class BaseRoute implements Responsive {
             .allMatch((i) -> pathA[i].startsWith(paramSymbol) || pathA[i].equals(pathB[i]));
   }
 
-  public Map<String, String> getParams(String path) {
+  Map<String, String> getParams(String path) {
     String[] pathA = splitPath(getPath());
     String[] pathB = splitPath(path);
     HashMap<String, String> params = new HashMap<>();

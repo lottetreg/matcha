@@ -7,14 +7,24 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.Map;
 
 public class BaseController implements Controllable {
   private Request request;
+  private Map<String, String> params = new HashMap<>();
   private HashMap<String, String> headers = new HashMap<>();
   private HashMap<String, Object> data = new HashMap<>();
 
   public Request getRequest() {
     return this.request;
+  }
+
+  public Map<String, String> getParams() {
+    return this.params;
+  }
+
+  public String getParam(String param) {
+    return getParams().get(param);
   }
 
   public void addHeader(String key, String value) {
@@ -27,6 +37,11 @@ public class BaseController implements Controllable {
 
   public Controllable setRequest(Request request) {
     this.request = request;
+    return this;
+  }
+
+  public Controllable setParams(Map<String, String> params) {
+    this.params = params;
     return this;
   }
 

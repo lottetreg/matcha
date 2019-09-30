@@ -3,8 +3,9 @@ package com.github.lottetreg.matcha;
 import com.github.lottetreg.cup.Request;
 import com.github.lottetreg.cup.Response;
 
-// TODO: still need this? Can just use BaseRoute?
-public interface Responsive {
+import java.util.Map;
+
+public interface Routable {
   String getPath();
 
   String getMethod();

@@ -32,7 +32,7 @@ public class RouterTest {
 
   @Test
   public void itReturnsTheResponseFromTheMatchingRoute() {
-    List<Responsive> routes = Collections.singletonList(new MockRoute("GET", "/"));
+    List<Routable> routes = Collections.singletonList(new MockRoute("GET", "/"));
     Request request = buildRequest("GET", "/");
 
     Response response = new Router(routes).route(request);
@@ -44,7 +44,7 @@ public class RouterTest {
 
   @Test
   public void itReturnsTheResponseFromTheCorrectRouteWithUrlParams() {
-    List<Responsive> routes = Collections.singletonList(new MockRoute("GET", "/posts/:slug"));
+    List<Routable> routes = Collections.singletonList(new MockRoute("GET", "/posts/:slug"));
     Request request = buildRequest("GET", "/posts/some-slug");
 
     Response response = new Router(routes).route(request);
@@ -56,7 +56,7 @@ public class RouterTest {
 
   @Test
   public void itReturns404IfThereIsNoRouteWithMatchingPath() {
-    List<Responsive> routes = new ArrayList<>();
+    List<Routable> routes = new ArrayList<>();
     Request request = buildRequest("GET", "/no_match");
 
     Response response = new Router(routes).route(request);
@@ -68,7 +68,7 @@ public class RouterTest {
 
   @Test
   public void itReturnsAnEmpty200IfItReceivesAHeadRequest() {
-    List<Responsive> routes = Collections.singletonList(new MockRoute("GET", "/"));
+    List<Routable> routes = Collections.singletonList(new MockRoute("GET", "/"));
     Request request = buildRequest("HEAD", "/");
 
     Response response = new Router(routes).route(request);
@@ -80,7 +80,7 @@ public class RouterTest {
 
   @Test
   public void itReturnsA200WithAllowedMethodsIfItReceivesAnOptionsRequest() {
-    List<Responsive> routes = Collections.singletonList(new MockRoute("GET", "/"));
+    List<Routable> routes = Collections.singletonList(new MockRoute("GET", "/"));
     Request request = buildRequest("OPTIONS", "/");
 
     Response response = new Router(routes).route(request);
@@ -92,7 +92,7 @@ public class RouterTest {
 
   @Test
   public void itReturns405WithAllowedMethodsIfThereIsNoMatchingMethodForTheRoute() {
-    List<Responsive> routes = Arrays.asList(
+    List<Routable> routes = Arrays.asList(
         new MockRoute("GET", "/"),
         new MockRoute("DELETE", "/"));
     Request request = buildRequest("POST", "/");
