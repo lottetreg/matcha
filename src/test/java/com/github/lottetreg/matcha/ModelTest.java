@@ -9,10 +9,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static junit.framework.TestCase.assertEquals;
 
-public class BaseModelTest {
+public class ModelTest {
   private static Path postsTable = Path.of("posts.csv");
 
   @BeforeClass
@@ -31,8 +32,8 @@ public class BaseModelTest {
   }
 
   @Test
-  public void itReturnsAListOfAllResourcesForAClass() {
-    List<Post> posts = BaseModel.all(Post.class);
+  public void allReturnsAListOfAllResourcesForAClass() {
+    List<Post> posts = Model.all(Post.class);
 
     assertEquals("how-to-do-something", posts.get(0).slug);
     assertEquals("How to Do Something", posts.get(0).title);
@@ -43,11 +44,30 @@ public class BaseModelTest {
   }
 
   @Test
-  public void itReturnsAResourceWithAGivenAttribute() {
-    Post post = BaseModel.findBy(Post.class, "slug", "how-to-do-something-else");
+  public void findByReturnsAResourceWithAGivenAttribute() {
+    Post post = Model.findBy(Post.class, "slug", "how-to-do-something-else");
 
     assertEquals("how-to-do-something-else", post.slug);
     assertEquals("How to Do Something Else", post.title);
     assertEquals("Have you ever wanted to know how to do something else?", post.body);
+  }
+
+  @Test
+  public void createPersistsTheObjectAndReturnsIt() {
+    Post post = new Post(
+        Map.of(
+            "slug", "how-to-do-another-thing",
+            "title", "How to Do Another Thing",
+            "body", "Have you ever tried to do another thing?"
+        )
+    );
+
+    Post createdPost = Model.create(post);
+
+    assertEquals("how-to-do-another-thing", createdPost.slug);
+    Post postFromDB = Model.findBy(Post.class, "slug", "how-to-do-another-thing");
+    assertEquals("how-to-do-another-thing", postFromDB.slug);
+    assertEquals("How to Do Another Thing", postFromDB.title);
+    assertEquals("Have you ever tried to do another thing?", postFromDB.body);
   }
 }

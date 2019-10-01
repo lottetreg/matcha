@@ -38,7 +38,7 @@ public class Matcha implements Callable {
 
   private static List<Routable> defaultRoutes() {
     return Arrays.asList(
-        new Resource("GET", "/", "/index.html")
+        new ResourceRoute("GET", "/", "/index.html")
     );
   }
 
@@ -55,8 +55,8 @@ public class Matcha implements Callable {
 
       stream.forEach(path -> {
         String resourcePath = "/" + Path.of(".").relativize(path).toString();
-        Resource resource = new Resource("GET", resourcePath, resourcePath);
-        resources.add(resource);
+        ResourceRoute resourceRoute = new ResourceRoute("GET", resourcePath, resourcePath);
+        resources.add(resourceRoute);
       });
     }
 

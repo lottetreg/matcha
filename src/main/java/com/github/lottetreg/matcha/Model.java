@@ -3,15 +3,17 @@ package com.github.lottetreg.matcha;
 import org.atteo.evo.inflector.English;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class BaseModel {
+public class Model {
   private static Persistable database = new CsvDatabase();
 
-  public BaseModel(Map<String, String> data) {
+  public Model(Map<String, String> data) {
     data.forEach(this::setField);
   }
 
@@ -24,10 +26,30 @@ public class BaseModel {
     }
   }
 
+  public static Map<String, Object> toMap(Object resource) {
+    List<Field> fields = List.of(resource.getClass().getDeclaredFields());
+    HashMap<String, Object> attributes = new HashMap<>();
+
+    fields.forEach(field -> {
+      try {
+        attributes.put(field.getName(), field.get(resource));
+      } catch (IllegalAccessException e) {
+        throw new RuntimeException(e);
+      }
+    });
+
+    return attributes;
+  }
+
+  public static <T> T create(T resource) {
+    database.insert(getTableName(resource.getClass()), toMap(resource));
+    return resource;
+  }
+
   public static <T> List<T> all(Class<T> resourceClass) {
     List<T> objects = new ArrayList<>();
 
-    for (Map<String, String> record : database.select(tableName(resourceClass))) {
+    for (Map<String, String> record : database.select(getTableName(resourceClass))) {
       objects.add(newInstance(resourceClass, record));
     }
 
@@ -37,11 +59,11 @@ public class BaseModel {
   public static <T> T findBy(Class<T> resourceClass, String attribute, String value) {
     return newInstance(
         resourceClass,
-        database.select(tableName(resourceClass), attribute, value)
+        database.select(getTableName(resourceClass), attribute, value)
     );
   }
 
-  private static String tableName(Class resourceClass) {
+  private static String getTableName(Class resourceClass) {
     return English.plural(resourceClass.getSimpleName()).toLowerCase();
   }
 

@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class BaseController implements Controllable {
   private Request request;
-  private Map<String, String> params = new HashMap<>();
+  private HashMap<String, String> params = new HashMap<>();
   private HashMap<String, String> headers = new HashMap<>();
   private HashMap<String, Object> data = new HashMap<>();
 
@@ -35,13 +35,16 @@ public class BaseController implements Controllable {
     this.data.put(key, value);
   }
 
-  public Controllable setRequest(Request request) {
-    this.request = request;
+  public Controllable addParams(Map<String, String> newParams) {
+    newParams.forEach((key, value) -> this.params.put(key, value));
+
     return this;
   }
 
-  public Controllable setParams(Map<String, String> params) {
-    this.params = params;
+  public Controllable setRequest(Request request) {
+    this.request = request;
+    addParams(UrlEncodedQuery.parse(this.request.getBody()));
+
     return this;
   }
 
@@ -49,6 +52,7 @@ public class BaseController implements Controllable {
     try {
       Method action = getClass().getMethod(actionName);
       Object result = action.invoke(this);
+      int statusCode = 200;
       byte[] body = new byte[]{};
 
       if (result instanceof Template) {
@@ -56,9 +60,16 @@ public class BaseController implements Controllable {
         Path path = Path.of(template.getPath());
         addHeader("Content-Type", FileHelpers.getContentType(path));
         body = template.render(this.data);
+
+      } if (result instanceof Redirect) {
+        Redirect redirect = (Redirect) result;
+        String path = redirect.getPath();
+        String uri = "http://" + getRequest().getHeader("Host") + path;
+        addHeader("Location", uri);
+        statusCode = 302;
       }
 
-      return new Response(200, this.headers, body);
+      return new Response(statusCode, this.headers, body);
 
     } catch (NoSuchMethodException e) {
       throw new MissingControllerAction(actionName, e);
