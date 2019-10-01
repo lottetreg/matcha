@@ -61,9 +61,9 @@ public class BaseController implements Controllable {
         addHeader("Content-Type", FileHelpers.getContentType(path));
         body = template.render(this.data);
 
-      } if (result instanceof RedirectThing) {
-        RedirectThing redirectThing = (RedirectThing) result;
-        String path = redirectThing.getPath();
+      } if (result instanceof Redirect) {
+        Redirect redirect = (Redirect) result;
+        String path = redirect.getPath();
         String uri = "http://" + getRequest().getHeader("Host") + path;
         addHeader("Location", uri);
         statusCode = 302;

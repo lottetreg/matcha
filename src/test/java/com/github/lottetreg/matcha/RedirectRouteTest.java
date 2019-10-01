@@ -10,32 +10,32 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
-public class RedirectTest {
+public class RedirectRouteTest {
   @Test
   public void itHasAPath() {
-    Redirect redirect = new Redirect("", "/", "");
-    assertEquals("/", redirect.getPath());
+    RedirectRoute redirectRoute = new RedirectRoute("", "/", "");
+    assertEquals("/", redirectRoute.getPath());
   }
 
   @Test
   public void itHasAMethod() {
-    Redirect redirect = new Redirect("GET", "", "");
-    assertEquals("GET", redirect.getMethod());
+    RedirectRoute redirectRoute = new RedirectRoute("GET", "", "");
+    assertEquals("GET", redirectRoute.getMethod());
   }
 
   @Test
   public void itHasARedirectPath() {
-    Redirect redirect = new Redirect("", "", "/redirect");
-    assertEquals("/redirect", redirect.getRedirectPath());
+    RedirectRoute redirectRoute = new RedirectRoute("", "", "/redirectRoute");
+    assertEquals("/redirectRoute", redirectRoute.getRedirectPath());
   }
 
   @Test
   public void itReturns301ResponseWithTheRedirectPathInTheHeaders() throws IOException {
     Request request = new Request("GET", "/", new HashMap<>(Map.of("Host", "www.example.com")), "");
 
-    Redirect redirect = new Redirect("", "", "/some_other_path");
+    RedirectRoute redirectRoute = new RedirectRoute("", "", "/some_other_path");
 
-    Response response = redirect.getResponse(request);
+    Response response = redirectRoute.getResponse(request);
 
     assertEquals(301, response.getStatusCode());
     assertEquals("", new String(response.getBody()));

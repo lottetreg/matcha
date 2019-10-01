@@ -8,34 +8,34 @@ import java.util.HashMap;
 
 import static org.junit.Assert.assertEquals;
 
-public class ResourceTest {
+public class ResourceRouteTest {
   private Request emptyRequest() {
     return new Request("GET", "/", new HashMap<>(), "");
   }
 
   @Test
   public void itHasAPath() {
-    Resource resource = new Resource("", "/", "");
-    assertEquals("/", resource.getPath());
+    ResourceRoute resourceRoute = new ResourceRoute("", "/", "");
+    assertEquals("/", resourceRoute.getPath());
   }
 
   @Test
   public void itHasAMethod() {
-    Resource resource = new Resource("GET", "", "");
-    assertEquals("GET", resource.getMethod());
+    ResourceRoute resourceRoute = new ResourceRoute("GET", "", "");
+    assertEquals("GET", resourceRoute.getMethod());
   }
 
   @Test
   public void itHasAResourcePath() {
-    Resource resource = new Resource("", "", "/");
-    assertEquals("/", resource.getResourcePath());
+    ResourceRoute resourceRoute = new ResourceRoute("", "", "/");
+    assertEquals("/", resourceRoute.getResourcePath());
   }
 
   @Test
   public void itReturnsA200ResponseWithTheResource() {
-    Resource resource = new Resource("", "", "/src/test/java/com/github/lottetreg/matcha/support/index.html");
+    ResourceRoute resourceRoute = new ResourceRoute("", "", "/src/test/java/com/github/lottetreg/matcha/support/index.html");
 
-    Response response = resource.getResponse(emptyRequest());
+    Response response = resourceRoute.getResponse(emptyRequest());
 
     assertEquals(200, response.getStatusCode());
     assertEquals("<h1>Hello, World!</h1>\n", new String(response.getBody()));
@@ -44,9 +44,9 @@ public class ResourceTest {
 
   @Test
   public void itReturnsA404IfTheResourceIsMissing() {
-    Resource resource = new Resource("", "", "/missing.html");
+    ResourceRoute resourceRoute = new ResourceRoute("", "", "/missing.html");
 
-    Response response = resource.getResponse(emptyRequest());
+    Response response = resourceRoute.getResponse(emptyRequest());
 
     assertEquals(404, response.getStatusCode());
     assertEquals("", new String(response.getBody()));
