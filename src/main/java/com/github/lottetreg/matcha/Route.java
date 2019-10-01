@@ -25,7 +25,7 @@ public class Route extends BaseRoute {
       Constructor<?> constructor = this.controllerClass.getConstructor();
       this.controller = ((Controllable) constructor.newInstance())
           .setRequest(request)
-          .setParams(getParams(request.getPath()));
+          .addParams(getParams(request.getPath()));
 
       return this.controller.call(actionName);
 

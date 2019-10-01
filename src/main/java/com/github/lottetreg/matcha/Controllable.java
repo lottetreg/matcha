@@ -8,9 +8,11 @@ import java.util.Map;
 interface Controllable {
   Controllable setRequest(Request request);
 
-  Controllable setParams(Map<String, String> params);
+  Controllable addParams(Map<String, String> params);
 
   Map<String, String> getParams();
+
+  String getParam(String paramName);
 
   Response call(String actionName);
 

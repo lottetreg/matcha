@@ -28,12 +28,7 @@ public class BaseControllerTest {
     public Template embeddedData() {
       List<Post> posts = List.of(new Post(Map.of("slug", "how-to-do-something")));
       addData("posts", posts);
-      return new Template("/templates/example.twig.html");
-    }
 
-    public Template embeddedDataWithParams() {
-      List<Post> posts = List.of(new Post(Map.of("slug", getParam("slug"))));
-      addData("posts", posts);
       return new Template("/templates/example.twig.html");
     }
   }
@@ -68,16 +63,24 @@ public class BaseControllerTest {
   }
 
   @Test
-  public void callReturnsAResponseFromAnActionThatReturnsATemplateWithParams() {
+  public void addParamsAddsToTheParams() {
     Controllable controller = new TestController()
-        .setRequest(emptyRequest())
-        .setParams(Map.of("slug", "how-to-do-something"));
+        .addParams(Map.of("some-param", "some value"));
 
-    Response response = controller.call("embeddedDataWithParams");
+    assertEquals("some value", controller.getParam("some-param"));
+  }
 
-    assertEquals(200, response.getStatusCode());
-    assertEquals("\n<h3>how-to-do-something</h3>\n\n", new String(response.getBody()));
-    assertEquals(new HashMap<>(Map.of("Content-Type", "text/html")), response.getHeaders());
+  @Test
+  public void setRequestAddsTheParamsFromTheRequestBody() {
+    String body = "slug=how-to-drive-a-car&title=How+to+Drive+a+Car&body=Have+you+ever+tried+to+drive+a+car%3F";
+    Request request = new Request("","", new HashMap<>(), body);
+
+    Controllable controller = new TestController()
+        .setRequest(request);
+
+    assertEquals("how-to-drive-a-car", controller.getParam("slug"));
+    assertEquals("How to Drive a Car", controller.getParam("title"));
+    assertEquals("Have you ever tried to drive a car?", controller.getParam("body"));
   }
 
   @Test

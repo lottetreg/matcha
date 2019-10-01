@@ -57,13 +57,15 @@ public class RouteTest {
       return this;
     }
 
-    public Controllable setParams(Map<String, String> params) {
+    public Controllable addParams(Map<String, String> params) {
       return this;
     }
 
     public Map<String, String> getParams() {
       return Map.of();
     }
+
+    public String getParam(String paramName) { return ""; }
 
     public Response call(String actionName) {
       return new Response(200);
