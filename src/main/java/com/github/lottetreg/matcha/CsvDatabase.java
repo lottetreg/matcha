@@ -4,16 +4,37 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 class CsvDatabase implements Persistable {
-  public List<Map<String, String>> select(String fileName) {
-    Iterable<CSVRecord> records = parse(fileName + ".csv");
+  public void insert(String tableName, Map<String, Object> data) {
+    try {
+      String csvName = tableName + ".csv";
+      Map<String, Integer> headerMap = CSVFormat.DEFAULT.withFirstRecordAsHeader()
+          .parse(new FileReader(csvName))
+          .getHeaderMap();
+
+      ArrayList<String> recordValues = new ArrayList<>();
+      headerMap.forEach((header, i) -> {
+        String value = data.get(header).toString();
+        recordValues.add(i, value);
+      });
+
+      FileWriter csvWriter = new FileWriter(csvName, true);
+      csvWriter.append(String.join(",", recordValues));
+      csvWriter.append("\n");
+      csvWriter.flush();
+      csvWriter.close();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public List<Map<String, String>> select(String tableName) {
+    Iterable<CSVRecord> records = parse(tableName + ".csv");
 
     List<Map<String, String>> results = new ArrayList<>();
     records.forEach((record) -> results.add(record.toMap()));
@@ -21,12 +42,12 @@ class CsvDatabase implements Persistable {
     return results;
   }
 
-  public Map<String, String> select(String fileName, String field, String value) {
-    Optional<Map<String, String>> match = select(fileName).stream()
-        .filter((record) -> record.get(field).equals(value))
+  public Map<String, String> select(String tableName, String field, Object value) {
+    Optional<Map<String, String>> match = select(tableName).stream()
+        .filter((record) -> record.get(field).equals(value.toString()))
         .findFirst();
 
-    return match.orElseThrow(() -> new NoRecordFound(fileName, field, value));
+    return match.orElseThrow(() -> new NoRecordFound(tableName, field, value.toString()));
   }
 
   private Iterable<CSVRecord> parse(String filePath) {
@@ -40,8 +61,8 @@ class CsvDatabase implements Persistable {
   }
 
   class NoRecordFound extends RuntimeException {
-    NoRecordFound(String fileName, String field, String value) {
-      super("No record found with " + field + " of " + value + " in " + fileName);
+    NoRecordFound(String tableName, String field, String value) {
+      super("No record found with " + field + " of " + value + " in " + tableName);
     }
   }
 }

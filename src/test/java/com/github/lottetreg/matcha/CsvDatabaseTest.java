@@ -62,6 +62,23 @@ public class CsvDatabaseTest {
   }
 
   @Test
+  public void itInsertsANewRecordInACSV() {
+    CsvDatabase database = new CsvDatabase();
+    Map<String, Object> data = Map.of(
+        "slug", "how-to-do-another-thing",
+        "title", "How to Do Another Thing",
+        "body", "Have you ever tried to do another thing?"
+    );
+
+    database.insert("posts", data);
+
+    Map<String, String> createdRecord = database.select("posts", "slug", "how-to-do-another-thing");
+    assertEquals("how-to-do-another-thing", createdRecord.get("slug"));
+    assertEquals("How to Do Another Thing", createdRecord.get("title"));
+    assertEquals("Have you ever tried to do another thing?", createdRecord.get("body"));
+  }
+
+  @Test
   public void itThrowsAnExceptionIfItCannotFindAMatchingRecord() {
     CsvDatabase database = new CsvDatabase();
 

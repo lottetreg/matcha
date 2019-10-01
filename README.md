@@ -41,7 +41,7 @@ Have your model class extend `BaseModel`. In order to make use of mass assignmen
 // in Post.java
 package com.github.lottetreg.myBlogApp;
 
-import com.github.lottetreg.matcha.BaseModel;
+import com.github.lottetreg.matcha.Model;
 
 import java.util.Map;
 
@@ -84,7 +84,7 @@ Create a `PostsController` class and have it extend `BaseController`. Add an act
 package com.github.lottetreg.myBlogApp;
 
 import com.github.lottetreg.matcha.BaseController;
-import com.github.lottetreg.matcha.BaseModel;
+import com.github.lottetreg.matcha.Model;
 import com.github.lottetreg.matcha.Template;
 
 public class PostsController extends BaseController {
@@ -138,7 +138,7 @@ Add another action to your `PostsController`. We've called this one `show`, and 
 package com.github.lottetreg.myBlogApp;
 
 import com.github.lottetreg.matcha.BaseController;
-import com.github.lottetreg.matcha.BaseModel;
+import com.github.lottetreg.matcha.Model;
 import com.github.lottetreg.matcha.Template;
 
 public class PostsController extends BaseController {

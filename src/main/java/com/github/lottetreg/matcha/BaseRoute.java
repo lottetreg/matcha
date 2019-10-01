@@ -22,25 +22,27 @@ public abstract class BaseRoute implements Routable {
     return this.method;
   }
 
-  public Boolean hasPath(String path) {
-    String[] pathA = splitPath(getPath());
-    String[] pathB = splitPath(path);
+  public Boolean hasPath(String requestPath) {
+    String[] splitPath = splitPath(getPath());
+    String[] splitRequestPath = splitPath(requestPath);
 
-    return (pathA.length == pathB.length) &&
+    return (splitPath.length == splitRequestPath.length) &&
         IntStream
-            .range(0, pathA.length)
-            .allMatch((i) -> pathA[i].startsWith(paramSymbol) || pathA[i].equals(pathB[i]));
+            .range(0, splitPath.length)
+            .allMatch((i) ->
+                splitPath[i].startsWith(paramSymbol) || splitPath[i].equals(splitRequestPath[i])
+            );
   }
 
-  Map<String, String> getParams(String path) {
-    String[] pathA = splitPath(getPath());
-    String[] pathB = splitPath(path);
+  Map<String, String> getParams(String requestPath) {
+    String[] splitPath = splitPath(getPath());
+    String[] splitRequestPath = splitPath(requestPath);
     HashMap<String, String> params = new HashMap<>();
 
     IntStream
-        .range(0, Math.min(pathA.length, pathB.length))
-        .filter((i) -> pathA[i].startsWith(paramSymbol))
-        .forEach((i) -> params.put(pathA[i].substring(1), pathB[i]));
+        .range(0, Math.min(splitPath.length, splitRequestPath.length))
+        .filter((i) -> splitPath[i].startsWith(paramSymbol))
+        .forEach((i) -> params.put(splitPath[i].substring(1), splitRequestPath[i]));
 
     return params;
   }
