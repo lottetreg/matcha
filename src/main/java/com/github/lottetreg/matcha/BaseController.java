@@ -52,6 +52,7 @@ public class BaseController implements Controllable {
     try {
       Method action = getClass().getMethod(actionName);
       Object result = action.invoke(this);
+      int statusCode = 200;
       byte[] body = new byte[]{};
 
       if (result instanceof Template) {
@@ -59,9 +60,16 @@ public class BaseController implements Controllable {
         Path path = Path.of(template.getPath());
         addHeader("Content-Type", FileHelpers.getContentType(path));
         body = template.render(this.data);
+
+      } if (result instanceof RedirectThing) {
+        RedirectThing redirectThing = (RedirectThing) result;
+        String path = redirectThing.getPath();
+        String uri = "http://" + getRequest().getHeader("Host") + path;
+        addHeader("Location", uri);
+        statusCode = 302;
       }
 
-      return new Response(200, this.headers, body);
+      return new Response(statusCode, this.headers, body);
 
     } catch (NoSuchMethodException e) {
       throw new MissingControllerAction(actionName, e);
