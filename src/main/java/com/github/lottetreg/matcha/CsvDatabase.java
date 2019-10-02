@@ -19,12 +19,13 @@ class CsvDatabase implements Persistable {
 
       ArrayList<String> recordValues = new ArrayList<>();
       headerMap.forEach((header, i) -> {
-        String value = data.get(header).toString();
+        String value = "\"" + data.get(header).toString() + "\"";
         recordValues.add(i, value);
       });
 
       FileWriter csvWriter = new FileWriter(csvName, true);
-      csvWriter.append(String.join(",", recordValues));
+      String value = String.join(",", recordValues);
+      csvWriter.append(value);
       csvWriter.append("\n");
       csvWriter.flush();
       csvWriter.close();
