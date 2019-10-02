@@ -56,7 +56,7 @@ public class Model {
     return objects;
   }
 
-  public static <T> T findBy(Class<T> resourceClass, String attribute, String value) {
+  public static <T> T findBy(Class<T> resourceClass, String attribute, Object value) {
     return newInstance(
         resourceClass,
         database.select(getTableName(resourceClass), attribute, value)
