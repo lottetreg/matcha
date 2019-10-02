@@ -31,7 +31,7 @@ public class Template {
     return EnvironmentConfigurationBuilder
         .configuration()
           .escape()
-            .withInitialEngine("js")
+            .withInitialEngine("html")
           .and()
         .build();
   }
