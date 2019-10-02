@@ -17,9 +17,6 @@ import java.util.Map;
 import static junit.framework.TestCase.assertEquals;
 
 public class CsvDatabaseTest {
-  @Rule
-  public ExpectedException exceptionRule = ExpectedException.none();
-
   private static Path postsTable = Path.of("posts.csv");
 
   @Before
@@ -74,17 +71,49 @@ public class CsvDatabaseTest {
   }
 
   @Test
-  public void itReturnsARecordWithMatchingCriteriaFromACSV() {
+  public void itReturnsAListOfAllRecordsFromACSVThatMatchTheCriteria() {
     List<String> lines = new ArrayList<>();
-    lines.add("how-to-do-something-else,How to Do Something Else,Have you ever wanted to know how to do something else?");
+    lines.add("how-to-do-something,How to Do Something,Have you ever wanted to know how to do something?");
+    lines.add("how-to-do-something,How to Do Something Else,Have you ever wanted to know how to do something else?");
     addLinesToPosts(lines);
     CsvDatabase database = new CsvDatabase();
 
-    Map<String, String> record = database.select("posts", "slug", "how-to-do-something-else");
+    List<Map<String, String>> records = database.select("posts", "slug", "how-to-do-something");
 
-    assertEquals("how-to-do-something-else", record.get("slug"));
-    assertEquals("How to Do Something Else", record.get("title"));
-    assertEquals("Have you ever wanted to know how to do something else?", record.get("body"));
+    assertEquals("how-to-do-something", records.get(0).get("slug"));
+    assertEquals("How to Do Something", records.get(0).get("title"));
+    assertEquals("Have you ever wanted to know how to do something?", records.get(0).get("body"));
+    assertEquals("how-to-do-something", records.get(1).get("slug"));
+    assertEquals("How to Do Something Else", records.get(1).get("title"));
+    assertEquals("Have you ever wanted to know how to do something else?", records.get(1).get("body"));
+  }
+
+  @Test
+  public void itReturnsAnEmptyListIfNoRecordsMatchTheCriteria() {
+    List<String> lines = new ArrayList<>();
+    lines.add("how-to-do-something,How to Do Something,Have you ever wanted to know how to do something?");
+    addLinesToPosts(lines);
+    CsvDatabase database = new CsvDatabase();
+
+    List<Map<String, String>> records = database.select("posts", "slug", "does-not-exist");
+
+    assertEquals(0, records.size());
+  }
+
+  @Test
+  public void itReturnsALimitedNumberOfRecordsWithMatchingCriteriaFromACSV() {
+    List<String> lines = new ArrayList<>();
+    lines.add("how-to-do-something-else,How to Do Something Else,Have you ever wanted to know how to do something else?");
+    lines.add("how-to-do-something,How to Do Something Else,Have you ever wanted to know how to do something else?");
+    addLinesToPosts(lines);
+    CsvDatabase database = new CsvDatabase();
+
+    List<Map<String, String>> records = database.select("posts", "slug", "how-to-do-something-else", 1);
+
+    assertEquals(1, records.size());
+    assertEquals("how-to-do-something-else", records.get(0).get("slug"));
+    assertEquals("How to Do Something Else", records.get(0).get("title"));
+    assertEquals("Have you ever wanted to know how to do something else?", records.get(0).get("body"));
   }
 
   @Test
@@ -100,15 +129,5 @@ public class CsvDatabaseTest {
 
     byte[] fileContent = Files.readAllBytes(postsTable);
     assertEquals("slug,title,body\n\"how-to-do-another-thing\",\"How to Do Another Thing\",\"Have you ever tried to do another thing?\"\n", new String(fileContent));
-  }
-
-  @Test
-  public void itThrowsAnExceptionIfItCannotFindAMatchingRecord() {
-    CsvDatabase database = new CsvDatabase();
-
-    exceptionRule.expect(CsvDatabase.NoRecordFound.class);
-    exceptionRule.expectMessage("No record found with slug of i-do-not-exist in posts");
-
-    database.select("posts", "slug", "i-do-not-exist");
   }
 }
