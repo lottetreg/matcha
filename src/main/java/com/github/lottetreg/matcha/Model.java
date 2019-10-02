@@ -13,11 +13,11 @@ import java.util.Map;
 public class Model {
   private static Persistable database = new CsvDatabase();
 
-  public Model(Map<String, String> data) {
+  public Model(Map<String, Object> data) {
     data.forEach(this::setField);
   }
 
-  private void setField(String field, String value) {
+  private void setField(String field, Object value) {
     try {
       this.getClass().getDeclaredField(field).set(this, value);
 

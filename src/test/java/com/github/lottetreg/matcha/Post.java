@@ -7,7 +7,7 @@ public class Post extends Model {
   public String title;
   public String body;
 
-  public Post(Map<String, String> data) {
+  public Post(Map<String, Object> data) {
     super(data);
   }
 }
