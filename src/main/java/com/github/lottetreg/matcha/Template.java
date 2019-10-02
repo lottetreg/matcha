@@ -2,6 +2,8 @@ package com.github.lottetreg.matcha;
 
 import org.jtwig.JtwigModel;
 import org.jtwig.JtwigTemplate;
+import org.jtwig.environment.EnvironmentConfiguration;
+import org.jtwig.environment.EnvironmentConfigurationBuilder;
 
 import java.util.Map;
 
@@ -13,7 +15,7 @@ public class Template {
   }
 
   byte[] render(Map<String, Object> context) {
-    JtwigTemplate template = JtwigTemplate.classpathTemplate(this.path);
+    JtwigTemplate template = JtwigTemplate.classpathTemplate(this.path, jtwigConfig());
     JtwigModel model = JtwigModel.newModel();
 
     context.forEach(model::with);
@@ -23,5 +25,14 @@ public class Template {
 
   String getPath() {
     return this.path;
+  }
+
+  private EnvironmentConfiguration jtwigConfig() {
+    return EnvironmentConfigurationBuilder
+        .configuration()
+          .escape()
+            .withInitialEngine("js")
+          .and()
+        .build();
   }
 }
