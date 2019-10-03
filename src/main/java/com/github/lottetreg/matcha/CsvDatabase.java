@@ -2,6 +2,7 @@ package com.github.lottetreg.matcha;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.text.StringEscapeUtils;
 
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -20,7 +21,7 @@ class CsvDatabase implements Persistable {
 
       ArrayList<String> recordValues = new ArrayList<>();
       headerMap.forEach((header, i) -> {
-        String value = "\"" + data.get(header).toString() + "\"";
+        String value = StringEscapeUtils.escapeCsv(data.get(header).toString());
         recordValues.add(i, value);
       });
 
