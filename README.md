@@ -1,12 +1,12 @@
 # Matcha
 
-A Java web framework
+An MVC Java web framework
 
 ## Setup
 
 In the `dependencies` of your build.gradle file add:
 
-```implementation 'com.github.lottetreg:matcha:development-SNAPSHOT'```
+```implementation 'com.github.lottetreg:matcha:master-SNAPSHOT'```
 
 ## Usage
 
@@ -91,7 +91,6 @@ public class PostsController extends BaseController {
 
   public Template index() {
     addData("posts", BaseModel.all(Post.class));
-
     return new Template("/templates/posts/index.twig.html");
   }
 }
@@ -148,13 +147,12 @@ public class PostsController extends BaseController {
   public Template show() {
     Post post = BaseModel.findBy(Post.class, "slug", getParam("slug"));
     addData("post", post);
-
     return new Template("/templates/posts/show.twig.html");
   }
 }
 ```
 
-Make sure you have your show template in your `resources` directory.
+Make sure you have your `show` template in your `resources` directory.
 
 Finally, add your new route:
 
@@ -188,9 +186,87 @@ public class MyBlogApp {
 }
 ```
 
+## Creating a Resource via a POST Request
 
+We're going to create a new `Post` with a form. Add a `newForm()` action to your `PostsController` that returns a `Template` of your form view.
 
+```java
+// in PostsController.java
+package com.github.lottetreg.myBlogApp;
 
+import com.github.lottetreg.matcha.BaseController;
+import com.github.lottetreg.matcha.Model;
+import com.github.lottetreg.matcha.Template;
+
+public class PostsController extends BaseController {
+
+  //...
+
+  public Template newForm() {
+    return new Template("/templates/posts/newForm.twig.html");
+  }
+}
+```
+
+Make sure you have your `newForm` template in your `resources` directory.
+
+Now, add your new route:
+
+```java
+// in in MyBlogApp.java
+package com.github.lottetreg.myBlogApp;
+
+import com.github.lottetreg.matcha.Matcha;
+import com.github.lottetreg.matcha.Routable;
+import com.github.lottetreg.matcha.Route;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+
+public class MyBlogApp {
+  public static void main(String[] args) {
+    try {
+      new Matcha(getRoutes()).serve(3000);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  private static List<Routable> getRoutes() {
+    return Arrays.asList(
+        new Route("GET", "/posts", PostsController.class, "index"),
+        new Route("GET", "/posts/new", PostsController.class, "newForm"),
+        new Route("GET", "/posts/:slug", PostsController.class, "show")
+    );
+  }
+}
+```
+
+Notice that the route for `posts/new` comes before `posts/:slug` so that requests to `posts/new` don't get swallowed up by `posts/:slug`.
+
+Now, in your `newForm` view, you probably have a form that will want to `POST` to an endpoint in the `PostsController`. Let's add a `create()` action to handle the creation of `Posts`.
+
+```java
+// in PostsController.java
+package com.github.lottetreg.myBlogApp;
+
+import com.github.lottetreg.matcha.BaseController;
+import com.github.lottetreg.matcha.Model;
+import com.github.lottetreg.matcha.Template;
+
+public class PostsController extends BaseController {
+
+  //...
+
+  public Redirect create() {
+    Post post = Model.create(new Post(getParams()));
+    return new Redirect("/posts/" + post.slug);
+  }
+}
+```
+
+Notice that this action returns a `Redirect`, and it redirects to the show page of the newly created `Post`. Redirecting here allows you to avoid the "Confirm Form Resubmission" alert you would otherwise get if you refreshed the page after submiting your form.
 
 
 
