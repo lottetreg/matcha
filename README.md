@@ -33,7 +33,7 @@ public class MyBlogApp {
   }  
 ```
 
-## Add a Model
+## Adding a Model
 
 Have your model class extend `BaseModel`. In order to make use of mass assignment, your model must have public fields. It must also have a constructor that calls `super`. For example:
 
@@ -99,7 +99,7 @@ public class PostsController extends BaseController {
 Now, add your route and pass it into your `Matcha` instance:
 
 ```java
-// in in MyBlogApp.java
+// in MyBlogApp.java
 package com.github.lottetreg.myBlogApp;
 
 import com.github.lottetreg.matcha.Matcha;
@@ -157,7 +157,7 @@ Make sure you have your `show` template in your `resources` directory.
 Finally, add your new route:
 
 ```java
-// in in MyBlogApp.java
+// in MyBlogApp.java
 package com.github.lottetreg.myBlogApp;
 
 import com.github.lottetreg.matcha.Matcha;
@@ -213,7 +213,7 @@ Make sure you have your `newForm` template in your `resources` directory.
 Now, add your new route:
 
 ```java
-// in in MyBlogApp.java
+// in MyBlogApp.java
 package com.github.lottetreg.myBlogApp;
 
 import com.github.lottetreg.matcha.Matcha;
