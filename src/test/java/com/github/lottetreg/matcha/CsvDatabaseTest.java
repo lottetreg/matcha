@@ -128,6 +128,21 @@ public class CsvDatabaseTest {
     database.insert("posts", data);
 
     byte[] fileContent = Files.readAllBytes(postsTable);
-    assertEquals("slug,title,body\n\"how-to-do-another-thing\",\"How to Do Another Thing\",\"Have you ever tried to do another thing?\"\n", new String(fileContent));
+    assertEquals("slug,title,body\nhow-to-do-another-thing,How to Do Another Thing,Have you ever tried to do another thing?\n", new String(fileContent));
+  }
+
+  @Test
+  public void itEscapesSpecialCharsWhenItInsertsANewRecordInACSV() throws IOException {
+    CsvDatabase database = new CsvDatabase();
+    Map<String, Object> data = Map.of(
+        "slug", "how-to-do-another-thing",
+        "title", "How, to Do Another Thing",
+        "body","Have, you ever \"tried\" to do another thing?"
+    );
+
+    database.insert("posts", data);
+
+    byte[] fileContent = Files.readAllBytes(postsTable);
+    assertEquals("slug,title,body\nhow-to-do-another-thing,\"How, to Do Another Thing\",\"Have, you ever \"\"tried\"\" to do another thing?\"\n", new String(fileContent));
   }
 }
