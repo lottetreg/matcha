@@ -1,23 +1,38 @@
 package com.github.lottetreg.matcha;
 
-import java.nio.file.Path;
+import org.jtwig.JtwigModel;
+import org.jtwig.JtwigTemplate;
+import org.jtwig.environment.EnvironmentConfiguration;
+import org.jtwig.environment.EnvironmentConfigurationBuilder;
+
 import java.util.Map;
 
 public class Template {
-  private Path path;
+  private String path;
 
   public Template(String path) {
-    this.path = Path.of(path);
+    this.path = path;
   }
 
-  byte[] render(Map<String, String> context) {
-    String fileContent = new String(FileHelpers.readFile(this.path));
-    String renderedStringTemplate = TemplateRenderer.render(context, fileContent);
+  byte[] render(Map<String, Object> context) {
+    JtwigTemplate template = JtwigTemplate.classpathTemplate(this.path, jtwigConfig());
+    JtwigModel model = JtwigModel.newModel();
 
-    return renderedStringTemplate.getBytes();
+    context.forEach(model::with);
+
+    return template.render(model).getBytes();
   }
 
-  Path getPath() {
+  String getPath() {
     return this.path;
+  }
+
+  private EnvironmentConfiguration jtwigConfig() {
+    return EnvironmentConfigurationBuilder
+        .configuration()
+          .escape()
+            .withInitialEngine("html")
+          .and()
+        .build();
   }
 }

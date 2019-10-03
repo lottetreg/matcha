@@ -9,6 +9,7 @@ import org.junit.rules.ExpectedException;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
@@ -17,16 +18,8 @@ public class RouteTest {
   @Rule
   public ExpectedException exceptionRule = ExpectedException.none();
 
-  private Request emptyRequest() {
-    return new Request("GET", "/", new HashMap<>(), "");
-  }
-
-  private Route newRouteForController(Class controller) {
-    return new Route("", "", controller, "");
-  }
-
   @Ignore
-  public static class Controller extends BaseController {
+  public static class MockController extends BaseController {
     public Response call(String actionName) {
       return new Response(200);
     }
@@ -34,27 +27,45 @@ public class RouteTest {
 
   @Test
   public void itReturnsAResponseFromCallingTheController() {
-    Route route = newRouteForController(RouteTest.Controller.class);
+    Route route = new Route("", "", RouteTest.MockController.class, "");
+    Request request = new Request("", "", new HashMap<>(), "");
 
-    Response response = route.getResponse(emptyRequest());
+    Response response = route.getResponse(request);
 
     assertEquals(200, response.getStatusCode());
     assertEquals("", new String(response.getBody()));
     assertEquals(new HashMap<>(), response.getHeaders());
   }
 
+  @Test
+  public void itSetsTheParamsOnTheController() {
+    Route route = new Route("", "/posts/:slug", RouteTest.MockController.class, "");
+    Request request = new Request("", "/posts/how-to-do-something", new HashMap<>(), "");
+
+    route.getResponse(request);
+
+    assertEquals("how-to-do-something", route.getController().getParams().get("slug"));
+  }
+
   @Ignore
   public static class BrokenConstructor implements Controllable {
-    Request request;
-
     public BrokenConstructor() {
       throw new RuntimeException();
     }
 
     public Controllable setRequest(Request request) {
-      this.request = request;
       return this;
     }
+
+    public Controllable addParams(Map<String, String> params) {
+      return this;
+    }
+
+    public Map<String, Object> getParams() {
+      return Map.of();
+    }
+
+    public String getParam(String paramName) { return ""; }
 
     public Response call(String actionName) {
       return new Response(200);
@@ -67,8 +78,8 @@ public class RouteTest {
     exceptionRule.expectCause(instanceOf(InvocationTargetException.class));
     exceptionRule.expectMessage("BrokenConstructor");
 
-    Route route = newRouteForController(RouteTest.BrokenConstructor.class);
-
-    route.getResponse(emptyRequest());
+    Route route = new Route("", "", BrokenConstructor.class, "");
+    Request request = new Request("", "", new HashMap<>(), "");
+    route.getResponse(request);
   }
 }

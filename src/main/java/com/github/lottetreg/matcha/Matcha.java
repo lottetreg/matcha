@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 public class Matcha implements Callable {
   private Router router;
 
-  public Matcha(List<Responsive> routes) throws IOException {
+  public Matcha(List<Routable> routes) throws IOException {
     this.router = new Router(getAllRoutes(routes));
   }
 
@@ -28,21 +28,22 @@ public class Matcha implements Callable {
     return this.router.route(request);
   }
 
-  private static List<Responsive> getAllRoutes(List<Responsive> routes) throws IOException {
-    routes.addAll(defaultRoutes());
-    routes.addAll(resourcesForCurrentDirectory());
+  private static List<Routable> getAllRoutes(List<Routable> routes) throws IOException {
+    List<Routable> mutableRoutesList = new ArrayList<>(routes);
+    mutableRoutesList.addAll(defaultRoutes());
+    mutableRoutesList.addAll(resourcesForCurrentDirectory());
 
-    return routes;
+    return mutableRoutesList;
   }
 
-  private static List<Responsive> defaultRoutes() {
+  private static List<Routable> defaultRoutes() {
     return Arrays.asList(
-        new Resource("GET", "/", "/index.html")
+        new ResourceRoute("GET", "/", "/index.html")
     );
   }
 
-  private static List<Responsive> resourcesForCurrentDirectory() throws IOException {
-    List<Responsive> resources = new ArrayList<>();
+  private static List<Routable> resourcesForCurrentDirectory() throws IOException {
+    List<Routable> resources = new ArrayList<>();
 
     BiPredicate<Path, BasicFileAttributes> isRegularFile =
         (path, attrs) -> attrs.isRegularFile();
@@ -54,8 +55,8 @@ public class Matcha implements Callable {
 
       stream.forEach(path -> {
         String resourcePath = "/" + Path.of(".").relativize(path).toString();
-        Resource resource = new Resource("GET", resourcePath, resourcePath);
-        resources.add(resource);
+        ResourceRoute resourceRoute = new ResourceRoute("GET", resourcePath, resourcePath);
+        resources.add(resourceRoute);
       });
     }
 

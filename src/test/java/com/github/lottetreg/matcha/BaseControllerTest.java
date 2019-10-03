@@ -8,8 +8,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.lang.reflect.InvocationTargetException;
-import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -21,29 +21,15 @@ public class BaseControllerTest {
     public void empty() {
     }
 
-    public String hello() {
-      return "Hello!";
-    }
-
-    public Path index() {
-      return Path.of("/src/test/java/com/github/lottetreg/matcha/support/index.html");
-    }
-
-    public Path missingFile() {
-      return Path.of("/missing.html");
-    }
-
     public void error() {
       throw new RuntimeException("Something went wrong");
     }
 
     public Template embeddedData() {
-      addData("name", "Pickles");
-      return new Template("/src/test/java/com/github/lottetreg/matcha/support/embedded_data.html");
-    }
+      List<Post> posts = List.of(new Post(Map.of("slug", "how-to-do-something")));
+      addData("posts", posts);
 
-    public Template missingData() {
-      return new Template("/src/test/java/com/github/lottetreg/matcha/support/embedded_data.html");
+      return new Template("/templates/example.twig.html");
     }
   }
 
@@ -66,36 +52,35 @@ public class BaseControllerTest {
   }
 
   @Test
-  public void callReturnsAResponseFromAnActionThatReturnsAString() {
-    Controllable controller = new TestController().setRequest(emptyRequest());
-
-    Response response = controller.call("hello");
-
-    assertEquals(200, response.getStatusCode());
-    assertEquals("Hello!", new String(response.getBody()));
-    assertEquals(new HashMap<>(Map.of("Content-Type", "text/plain")), response.getHeaders());
-  }
-
-  @Test
-  public void callReturnsAResponseFromAnActionThatReturnsAPath() {
-    Controllable controller = new TestController().setRequest(emptyRequest());
-
-    Response response = controller.call("index");
-
-    assertEquals(200, response.getStatusCode());
-    assertEquals("<h1>Hello, World!</h1>\n", new String(response.getBody()));
-    assertEquals(new HashMap<>(Map.of("Content-Type", "text/html")), response.getHeaders());
-  }
-
-  @Test
   public void callReturnsAResponseFromAnActionThatReturnsATemplate() {
     Controllable controller = new TestController().setRequest(emptyRequest());
 
     Response response = controller.call("embeddedData");
 
     assertEquals(200, response.getStatusCode());
-    assertEquals("<h1>Hello, Pickles!</h1>\n", new String(response.getBody()));
+    assertEquals("\n<h3>how-to-do-something</h3>\n\n", new String(response.getBody()));
     assertEquals(new HashMap<>(Map.of("Content-Type", "text/html")), response.getHeaders());
+  }
+
+  @Test
+  public void addParamsAddsToTheParams() {
+    Controllable controller = new TestController()
+        .addParams(Map.of("some-param", "some value"));
+
+    assertEquals("some value", controller.getParam("some-param"));
+  }
+
+  @Test
+  public void setRequestAddsTheParamsFromTheRequestBody() {
+    String body = "slug=how-to-drive-a-car&title=How+to+Drive+a+Car&body=Have+you+ever+tried+to+drive+a+car%3F";
+    Request request = new Request("","", new HashMap<>(), body);
+
+    Controllable controller = new TestController()
+        .setRequest(request);
+
+    assertEquals("how-to-drive-a-car", controller.getParam("slug"));
+    assertEquals("How to Drive a Car", controller.getParam("title"));
+    assertEquals("Have you ever tried to drive a car?", controller.getParam("body"));
   }
 
   @Test
@@ -118,27 +103,5 @@ public class BaseControllerTest {
     exceptionRule.expectMessage("error");
 
     controller.call("error");
-  }
-
-  @Test
-  public void callReturns404IfFileIsMissing() {
-    Controllable controller = new TestController().setRequest(emptyRequest());
-
-    Response response = controller.call("missingFile");
-
-    assertEquals(404, response.getStatusCode());
-    assertEquals("", new String(response.getBody()));
-    assertEquals(new HashMap<>(), response.getHeaders());
-  }
-
-  @Test
-  public void callThrowsAnExceptionIfTemplateDataIsMissing() {
-    Controllable controller = new TestController().setRequest(emptyRequest());
-
-    exceptionRule.expect(Controllable.MissingTemplateData.class);
-    exceptionRule.expectCause(instanceOf(TemplateRenderer.MissingContextKey.class));
-    exceptionRule.expectMessage("name");
-
-    controller.call("missingData");
   }
 }

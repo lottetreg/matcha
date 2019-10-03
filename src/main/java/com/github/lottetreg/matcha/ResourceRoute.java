@@ -6,10 +6,10 @@ import com.github.lottetreg.cup.Response;
 import java.nio.file.Path;
 import java.util.Map;
 
-public class Resource extends BaseRoute {
+public class ResourceRoute extends BaseRoute {
   private String resourcePath;
 
-  public Resource(String method, String path, String resourcePath) {
+  public ResourceRoute(String method, String path, String resourcePath) {
     super(method, path);
     this.resourcePath = resourcePath;
   }

@@ -7,12 +7,13 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 public class Route extends BaseRoute {
-  private Class controller;
+  private Class controllerClass;
   private String actionName;
+  private Controllable controller;
 
-  public Route(String method, String path, Class controller, String actionName) {
+  public Route(String method, String path, Class controllerClass, String actionName) {
     super(method, path);
-    this.controller = controller;
+    this.controllerClass = controllerClass;
     this.actionName = actionName;
   }
 
@@ -21,10 +22,12 @@ public class Route extends BaseRoute {
     String actionName = getActionName();
 
     try {
-      Constructor<?> constructor = this.controller.getConstructor();
-      Controllable controller = ((Controllable) constructor.newInstance()).setRequest(request);
+      Constructor<?> constructor = this.controllerClass.getConstructor();
+      this.controller = ((Controllable) constructor.newInstance())
+          .setRequest(request)
+          .addParams(getParams(request.getPath()));
 
-      return controller.call(actionName);
+      return this.controller.call(actionName);
 
     } catch (NoSuchMethodException e) {
       throw new MissingControllerConstructor(controllerName, e);
@@ -34,8 +37,12 @@ public class Route extends BaseRoute {
     }
   }
 
+  public Controllable getController() {
+    return this.controller;
+  }
+
   private String getControllerName() {
-    return this.controller.getSimpleName();
+    return this.controllerClass.getSimpleName();
   }
 
   private String getActionName() {
