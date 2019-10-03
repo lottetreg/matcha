@@ -61,7 +61,7 @@ public class RouteTest {
       return this;
     }
 
-    public Map<String, String> getParams() {
+    public Map<String, Object> getParams() {
       return Map.of();
     }
 

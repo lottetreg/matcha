@@ -10,9 +10,9 @@ interface Controllable {
 
   Controllable addParams(Map<String, String> params);
 
-  Map<String, String> getParams();
+  Map<String, Object> getParams();
 
-  String getParam(String paramName);
+  Object getParam(String paramName);
 
   Response call(String actionName);
 

@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.*;
+import java.util.stream.Collectors;
 
 class CsvDatabase implements Persistable {
   public void insert(String tableName, Map<String, Object> data) {
@@ -29,6 +30,7 @@ class CsvDatabase implements Persistable {
       csvWriter.append("\n");
       csvWriter.flush();
       csvWriter.close();
+
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -43,12 +45,16 @@ class CsvDatabase implements Persistable {
     return results;
   }
 
-  public Map<String, String> select(String tableName, String field, Object value) {
-    Optional<Map<String, String>> match = select(tableName).stream()
+  public List<Map<String, String>> select(String tableName, String field, Object value) {
+    return select(tableName).stream()
         .filter((record) -> record.get(field).equals(value.toString()))
-        .findFirst();
+        .collect(Collectors.toList());
+  }
 
-    return match.orElseThrow(() -> new NoRecordFound(tableName, field, value.toString()));
+  public List<Map<String, String>> select(String tableName, String field, Object value, Integer limit) {
+    return select(tableName, field, value).stream()
+        .limit(limit)
+        .collect(Collectors.toList());
   }
 
   private Iterable<CSVRecord> parse(String filePath) {
@@ -58,12 +64,6 @@ class CsvDatabase implements Persistable {
 
     } catch (IOException e) {
       throw new RuntimeException(e);
-    }
-  }
-
-  class NoRecordFound extends RuntimeException {
-    NoRecordFound(String tableName, String field, String value) {
-      super("No record found with " + field + " of " + value + " in " + tableName);
     }
   }
 }

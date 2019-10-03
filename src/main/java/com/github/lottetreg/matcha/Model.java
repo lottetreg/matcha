@@ -5,10 +5,7 @@ import org.atteo.evo.inflector.English;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Model {
   private static Persistable database = new CsvDatabase();
@@ -47,34 +44,51 @@ public class Model {
   }
 
   public static <T> List<T> all(Class<T> resourceClass) {
-    List<T> objects = new ArrayList<>();
-
-    for (Map<String, String> record : database.select(getTableName(resourceClass))) {
-      objects.add(newInstance(resourceClass, record));
-    }
-
-    return objects;
+    return newInstances(resourceClass, database.select(getTableName(resourceClass)));
   }
 
-  public static <T> T findBy(Class<T> resourceClass, String attribute, String value) {
-    return newInstance(
-        resourceClass,
-        database.select(getTableName(resourceClass), attribute, value)
-    );
+  public static <T> List<T> findBy(Class<T> resourceClass, String attribute, Object value) {
+    return newInstances(resourceClass, database.select(getTableName(resourceClass), attribute, value));
+  }
+
+  public static <T> T findFirstBy(Class<T> resourceClass, String attribute, Object value) {
+    List<Map<String, String>> records = database.select(getTableName(resourceClass), attribute, value, 1);
+
+    if(records.size() == 0) {
+      throw new RecordNotFound(resourceClass.getSimpleName(), attribute, value.toString());
+    } else {
+      return newInstance(resourceClass, records.get(0));
+    }
   }
 
   private static String getTableName(Class resourceClass) {
     return English.plural(resourceClass.getSimpleName()).toLowerCase();
   }
 
-  private static <T> T newInstance(Class<T> resourceClass, Map<String, String> data) {
+  private static <T> T newInstance(Class<T> resourceClass, Map<String, String> record) {
     try {
       Constructor<T> constructor = resourceClass.getConstructor(Map.class);
-      return constructor.newInstance(data);
+      return constructor.newInstance(record);
 
     } catch (NoSuchMethodException | InstantiationException |
         IllegalAccessException | InvocationTargetException e) {
       throw new RuntimeException(e);
+    }
+  }
+
+  private static <T> List<T> newInstances(Class<T> resourceClass, List<Map<String, String>> records) {
+    List<T> objects = new ArrayList<>();
+
+    for (Map<String, String> record : records) {
+      objects.add(newInstance(resourceClass, record));
+    }
+
+    return objects;
+  }
+
+  public static class RecordNotFound extends RuntimeException {
+    RecordNotFound(String className, String field, String value) {
+      super("Not found: " + className + " with " + field + " of " + value);
     }
   }
 }

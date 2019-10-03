@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class BaseController implements Controllable {
   private Request request;
-  private HashMap<String, String> params = new HashMap<>();
+  private HashMap<String, Object> params = new HashMap<>();
   private HashMap<String, String> headers = new HashMap<>();
   private HashMap<String, Object> data = new HashMap<>();
 
@@ -19,11 +19,11 @@ public class BaseController implements Controllable {
     return this.request;
   }
 
-  public Map<String, String> getParams() {
+  public Map<String, Object> getParams() {
     return this.params;
   }
 
-  public String getParam(String param) {
+  public Object getParam(String param) {
     return getParams().get(param);
   }
 

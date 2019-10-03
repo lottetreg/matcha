@@ -1,9 +1,9 @@
 package com.github.lottetreg.matcha;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
+import org.junit.rules.ExpectedException;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,25 +14,51 @@ import java.util.Map;
 import static junit.framework.TestCase.assertEquals;
 
 public class ModelTest {
+  @Rule
+  public ExpectedException exceptionRule = ExpectedException.none();
+
   private static Path postsTable = Path.of("posts.csv");
 
-  @BeforeClass
-  public static void setUpPostsTable() throws IOException {
+  @Before
+  public void setUpPostsTable() throws IOException {
     Files.createFile(postsTable);
     List<String> lines = new ArrayList<>();
     lines.add("slug,title,body");
-    lines.add("how-to-do-something,How to Do Something,Have you ever wanted to know how to do something?");
-    lines.add("how-to-do-something-else,How to Do Something Else,Have you ever wanted to know how to do something else?");
     Files.write(postsTable, lines);
   }
 
-  @AfterClass
-  public static void tearDownPostsTable() throws IOException {
+  @After
+  public void tearDownPostsTable() throws IOException {
     Files.delete(postsTable);
+  }
+
+  private void addLinesToPosts(List<String> lines) {
+    try {
+      FileWriter csvWriter = new FileWriter(postsTable.toString(), true);
+
+      lines.forEach((line) -> {
+        try {
+          csvWriter.append(line);
+          csvWriter.append("\n");
+        } catch (IOException e) {
+          throw new RuntimeException(e);
+        }
+      });
+
+      csvWriter.flush();
+      csvWriter.close();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   @Test
   public void allReturnsAListOfAllResourcesForAClass() {
+    List<String> lines = new ArrayList<>();
+    lines.add("how-to-do-something,How to Do Something,Have you ever wanted to know how to do something?");
+    lines.add("how-to-do-something-else,How to Do Something Else,Have you ever wanted to know how to do something else?");
+    addLinesToPosts(lines);
+
     List<Post> posts = Model.all(Post.class);
 
     assertEquals("how-to-do-something", posts.get(0).slug);
@@ -44,12 +70,41 @@ public class ModelTest {
   }
 
   @Test
-  public void findByReturnsAResourceWithAGivenAttribute() {
-    Post post = Model.findBy(Post.class, "slug", "how-to-do-something-else");
+  public void findByReturnsAListOfAllResourcesForAClassThatMatchTheCriteria() {
+    List<String> lines = new ArrayList<>();
+    lines.add("how-to-do-something,How to Do Something,Have you ever wanted to know how to do something?");
+    lines.add("how-to-do-something-else,How to Do Something Else,Have you ever wanted to know how to do something else?");
+    addLinesToPosts(lines);
+
+    List<Post> posts = Model.findBy(Post.class, "slug", "how-to-do-something");
+
+    assertEquals(1, posts.size());
+    assertEquals("how-to-do-something", posts.get(0).slug);
+    assertEquals("How to Do Something", posts.get(0).title);
+    assertEquals("Have you ever wanted to know how to do something?", posts.get(0).body);
+  }
+
+  @Test
+  public void findFirstByReturnsAResourceWithAGivenAttribute() {
+    List<String> lines = new ArrayList<>();
+    lines.add("how-to-do-something,How to Do Something,Have you ever wanted to know how to do something?");
+    lines.add("how-to-do-something-else,How to Do Something Else,Have you ever wanted to know how to do something else?");
+    addLinesToPosts(lines);
+
+    Post post = Model.findFirstBy(Post.class, "slug", "how-to-do-something-else");
 
     assertEquals("how-to-do-something-else", post.slug);
     assertEquals("How to Do Something Else", post.title);
     assertEquals("Have you ever wanted to know how to do something else?", post.body);
+  }
+
+
+  @Test
+  public void findFirstByThrowsAnExceptionIfItCannotFindAResource() {
+    exceptionRule.expect(Model.RecordNotFound.class);
+    exceptionRule.expectMessage("Not found: Post with slug of does-not-exist");
+
+    Model.findFirstBy(Post.class, "slug", "does-not-exist");
   }
 
   @Test
@@ -65,7 +120,7 @@ public class ModelTest {
     Post createdPost = Model.create(post);
 
     assertEquals("how-to-do-another-thing", createdPost.slug);
-    Post postFromDB = Model.findBy(Post.class, "slug", "how-to-do-another-thing");
+    Post postFromDB = Model.findFirstBy(Post.class, "slug", "how-to-do-another-thing");
     assertEquals("how-to-do-another-thing", postFromDB.slug);
     assertEquals("How to Do Another Thing", postFromDB.title);
     assertEquals("Have you ever tried to do another thing?", postFromDB.body);
