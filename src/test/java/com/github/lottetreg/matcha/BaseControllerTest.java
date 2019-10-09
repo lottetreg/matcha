@@ -26,7 +26,7 @@ public class BaseControllerTest {
     }
 
     public Template embeddedData() {
-      List<Post> posts = List.of(new Post(Map.of("slug", "how-to-do-something")));
+      List<Post> posts = List.of(new Post("how-to-do-something", "", ""));
       addData("posts", posts);
 
       return new Template("/templates/example.twig.html");

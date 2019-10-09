@@ -10,19 +10,6 @@ import java.util.*;
 public class Model {
   private static Persistable database = new CsvDatabase();
 
-  public Model(Map<String, Object> data) {
-    data.forEach(this::setField);
-  }
-
-  private void setField(String field, Object value) {
-    try {
-      this.getClass().getDeclaredField(field).set(this, value);
-
-    } catch (NoSuchFieldException | IllegalAccessException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
   public static Map<String, Object> toMap(Object resource) {
     List<Field> fields = List.of(resource.getClass().getDeclaredFields());
     HashMap<String, Object> attributes = new HashMap<>();
@@ -38,9 +25,13 @@ public class Model {
     return attributes;
   }
 
-  public static <T> T create(T resource) {
+  public static <T> T save(T resource) {
     database.insert(getTableName(resource.getClass()), toMap(resource));
     return resource;
+  }
+
+  public static <T> T create(Class<T> resourceClass, Map<String, String> data) {
+    return save(newInstance(resourceClass, data));
   }
 
   public static <T> List<T> all(Class<T> resourceClass) {
@@ -67,11 +58,24 @@ public class Model {
 
   private static <T> T newInstance(Class<T> resourceClass, Map<String, String> record) {
     try {
-      Constructor<T> constructor = resourceClass.getConstructor(Map.class);
-      return constructor.newInstance(record);
+      Constructor<T> constructor = resourceClass.getConstructor();
+      T resource = constructor.newInstance();
+
+      record.forEach((field, value) -> setField(resource, field, value));
+
+      return resource;
 
     } catch (NoSuchMethodException | InstantiationException |
         IllegalAccessException | InvocationTargetException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private static void setField(Object resource, String field, Object value) {
+    try {
+      resource.getClass().getDeclaredField(field).set(resource, value);
+
+    } catch (NoSuchFieldException | IllegalAccessException e) {
       throw new RuntimeException(e);
     }
   }
