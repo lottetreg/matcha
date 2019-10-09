@@ -1,6 +1,9 @@
 package com.github.lottetreg.matcha;
 
-import org.junit.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.io.FileWriter;
@@ -108,16 +111,32 @@ public class ModelTest {
   }
 
   @Test
-  public void createPersistsTheObjectAndReturnsIt() {
+  public void savePersistsTheGivenObjectAndReturnsIt() {
     Post post = new Post(
+        "how-to-do-another-thing",
+        "How to Do Another Thing",
+        "Have you ever tried to do another thing?"
+    );
+
+    Post createdPost = Model.save(post);
+
+    assertEquals("how-to-do-another-thing", createdPost.slug);
+    Post postFromDB = Model.findFirstBy(Post.class, "slug", "how-to-do-another-thing");
+    assertEquals("how-to-do-another-thing", postFromDB.slug);
+    assertEquals("How to Do Another Thing", postFromDB.title);
+    assertEquals("Have you ever tried to do another thing?", postFromDB.body);
+  }
+
+  @Test
+  public void createPersistsAnObjectOfTheGivenClassWithTheGivenAttributesAndReturnsIt() {
+    Post createdPost = Model.create(
+        Post.class,
         Map.of(
             "slug", "how-to-do-another-thing",
             "title", "How to Do Another Thing",
             "body", "Have you ever tried to do another thing?"
         )
     );
-
-    Post createdPost = Model.create(post);
 
     assertEquals("how-to-do-another-thing", createdPost.slug);
     Post postFromDB = Model.findFirstBy(Post.class, "slug", "how-to-do-another-thing");

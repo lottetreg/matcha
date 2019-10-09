@@ -12,7 +12,7 @@ public class TemplateTest {
   @Test
   public void itRendersItself() {
     Template template = new Template("/templates/example.twig.html");
-    List<Post> posts = List.of(new Post(Map.of("slug", "how-to-do-something")));
+    List<Post> posts = List.of(new Post("how-to-do-something", "", ""));
     Map<String, Object> context = Map.of("posts", posts);
 
     byte[] renderedTemplate = template.render(context);
@@ -23,7 +23,7 @@ public class TemplateTest {
   @Test
   public void itEscapesHTML() {
     Template template = new Template("/templates/example.twig.html");
-    List<Post> posts = List.of(new Post(Map.of("slug", "<h1>how-to-do-something</h1>")));
+    List<Post> posts = List.of(new Post("<h1>how-to-do-something</h1>", "", ""));
     Map<String, Object> context = Map.of("posts", posts);
 
     byte[] renderedTemplate = template.render(context);
